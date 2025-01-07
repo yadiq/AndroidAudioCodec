@@ -5,8 +5,11 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.hqumath.nativedemo.databinding.ActivityMainBinding;
+import com.hqumath.nativedemo.utils.ByteUtil;
 import com.hqumath.nativedemo.utils.CommonUtil;
+import com.hqumath.nativedemo.utils.LogUtil;
 
+import org.freedesktop.audiocodec.AudioCodec;
 import org.freedesktop.demo.Demo;
 
 /**
@@ -32,56 +35,26 @@ public class MainActivity extends AppCompatActivity {
 
         //网络请求
         binding.btnHttp.setOnClickListener(v -> {
-            CommonUtil.toast("发送网络请求");
-            binding.tv1.setText("1.curl库发送get post请求，\n2.jsoncpp库处理json，\n结果见日志。");
-            Demo.curlTest("");
+            byte[] data1 = ByteUtil.hexToBytes("010203040506");
+            LogUtil.d(" data1=" + ByteUtil.bytesToHexWithSpace(data1));
+            byte[] data2 = new byte[data1.length];
+            int len2 = AudioCodec.g711Encode(data1, data2, data1.length, 1);
+            LogUtil.d("g711Encode: len=" + len2 + " data=" + ByteUtil.bytesToHexWithSpace(data2));
+            byte[] data3 = new byte[len2 * 2];
+            int len3 = AudioCodec.g711Decode(data2, data3, len2, 1);
+            LogUtil.d("g711Decode: len=" + len3 + " data=" + ByteUtil.bytesToHexWithSpace(data3));
+
         });
 
         //加解密
         binding.btnEncrypt.setOnClickListener(v -> {
-            String plaintext = "123abc";
-            String key = "12345678901234567890123456789012";
-            String iv = "1234567890123456";
-            String result = Demo.encryptTest(plaintext, key, iv);
-            binding.tv1.setText("aes256cbc加密:\n  明文: " + plaintext + "\n  密钥: " + key + "\n  偏移量: " + iv + "\n  结果: " + result + "\n更多加解密方式，见日志: \n  aes256gcm、aes256cbc、aes128ecb、\n  sha1、hmacSHA256");
+            LogUtil.d("测试日志");
+//            String plaintext = "123abc";
+//            String key = "12345678901234567890123456789012";
+//            String iv = "1234567890123456";
+//            String result = Demo.encryptTest(plaintext, key, iv);
+//            binding.tv1.setText("aes256cbc加密:\n  明文: " + plaintext + "\n  密钥: " + key + "\n  偏移量: " + iv + "\n  结果: " + result + "\n更多加解密方式，见日志: \n  aes256gcm、aes256cbc、aes128ecb、\n  sha1、hmacSHA256");
         });
 
-        //数据类型转换
-        binding.btnType.setOnClickListener(v -> {
-            String value = "123abc";
-            String result = Demo.typeTest(value);
-            binding.tv1.setText("bytes转hex:\n  " + value + " => " + result + "\n更多c++数据类型转换，见日志。");
-        });
-
-        //测试
-        binding.btnTest.setOnClickListener(v -> {
-            //动态注册的方法
-            String result = Demo.registerNatives("123");
-            binding.tv1.setText("1.JNI动态注册测试。");
-
-        });
-
-
-        //格式化字符串
-        //StringUtil.stringToArray("ivrealfly0241116");
-        //多线程
-        //Demo demo = new Demo();
-        //demo.thread1();
-
-
-//        binding.btn2.setOnClickListener(v -> {
-//            //加密
-//        /*String encrypt = Lianjing.method01("123456789012345");
-//        LogUtil.d("encrypt： " + encrypt);
-//        String decrypt = Lianjing.method02(encrypt);
-//        LogUtil.d("decrypt： " + decrypt);*/
-//        });
-
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        CommonUtil.killProgress();
     }
 }
