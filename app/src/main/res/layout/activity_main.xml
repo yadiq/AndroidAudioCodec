@@ -7,17 +7,17 @@
     android:padding="20dp">
 
     <Button
-        android:id="@+id/btnHttp"
+        android:id="@+id/btnEncode"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="http请求" />
+        android:text="录音并编码" />
 
     <Button
-        android:id="@+id/btnEncrypt"
+        android:id="@+id/btnDecode"
         android:layout_marginTop="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="加解密" />
+        android:text="解码并播放" />
 
     <TextView
         android:layout_marginTop="10dp"
