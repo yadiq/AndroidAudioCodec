@@ -7,25 +7,53 @@
     android:padding="20dp">
 
     <Button
-        android:id="@+id/btnEncode"
+        android:id="@+id/btnRecord"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="录音并编码" />
+        android:text="录音" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnEncode1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="G711_U_LAW 编码" />
+
+        <Button
+            android:id="@+id/btnEncode2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="G723 编码" />
+
+    </LinearLayout>
 
     <Button
-        android:id="@+id/btnDecode"
-        android:layout_marginTop="10dp"
+        android:id="@+id/btnPlay"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="解码并播放" />
+        android:layout_marginTop="10dp"
+        android:text="解码播放" />
 
     <TextView
-        android:layout_marginTop="10dp"
-        android:id="@+id/tv1"
+        android:id="@+id/tvPcm"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="150dp"
+        android:layout_marginTop="10dp"
         android:textColor="@color/black"
-        tools:text="测试信息" />
+        android:text="原始数据:" />
 
+    <TextView
+        android:id="@+id/tvEncode"
+        android:layout_width="wrap_content"
+        android:layout_height="150dp"
+        android:layout_marginTop="10dp"
+        android:textColor="@color/black"
+        android:text="编码数据:" />
 
 </LinearLayout>

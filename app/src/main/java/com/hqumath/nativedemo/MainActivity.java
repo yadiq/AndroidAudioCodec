@@ -16,10 +16,8 @@ import androidx.core.content.ContextCompat;
 import com.hqumath.nativedemo.databinding.ActivityMainBinding;
 import com.hqumath.nativedemo.utils.ByteUtil;
 import com.hqumath.nativedemo.utils.CommonUtil;
-import com.hqumath.nativedemo.utils.LogUtil;
 
 import org.freedesktop.audiocodec.AudioCodec;
-import org.freedesktop.demo.Demo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +35,9 @@ public class MainActivity extends AppCompatActivity {
     private final String TAG = "Native";
     private final int REQUEST_RECORD_AUDIO = 0x01;//请求录音权限
     private Activity mContext;
-    private List<byte[]> audioData = new ArrayList<>();
+    private List<byte[]> pcmData = new ArrayList<>();//原始数据
+    private List<byte[]> encodeData = new ArrayList<>();//编码数据
+    private List<byte[]> decodeData = new ArrayList<>();//解码数据
 
     private AudioRecordHelper audioRecordHelper;
 
@@ -73,15 +73,19 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("ClickableViewAccessibility")
     private void initListener() {
         //录音并编码
-        binding.btnEncode.setOnTouchListener(new View.OnTouchListener() {
+        binding.btnRecord.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         //检查录音权限
                         if (ContextCompat.checkSelfPermission(mContext, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+                            binding.btnRecord.setText("录音中...");
                             //清空缓存
-                            audioData.clear();
+                            binding.tvPcm.setText("");
+                            binding.tvEncode.setText("");
+                            pcmData.clear();
+                            encodeData.clear();
                             //开始录音
                             audioRecordHelper.start();
                         } else {
@@ -90,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case MotionEvent.ACTION_UP:
                     case MotionEvent.ACTION_CANCEL:
+                        binding.btnRecord.setText("录音");
                         if (ContextCompat.checkSelfPermission(mContext, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
                             audioRecordHelper.stop();
                         }
@@ -98,28 +103,29 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
-//        binding.btnEncode.setOnClickListener(v -> {
-//            //检查录音权限
-//            if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
-//
-//
-//            } else {
-//                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, REQUEST_RECORD_AUDIO);
-//            }
-//
-////            byte[] data1 = ByteUtil.hexToBytes("010203040506010203040506010203040506");
-////            LogUtil.d(" data1=" + ByteUtil.bytesToHexWithSpace(data1));
-////            byte[] data2 = new byte[data1.length];
-////            int len2 = AudioCodec.g711Encode(data1, data2, data1.length, 1);
-////            LogUtil.d("g711Encode: len=" + len2 + " data=" + ByteUtil.bytesToHexWithSpace(data2));
-////            byte[] data3 = new byte[len2 * 2];
-////            int len3 = AudioCodec.g711Decode(data2, data3, len2, 1);
-////            LogUtil.d("g711Decode: len=" + len3 + " data=" + ByteUtil.bytesToHexWithSpace(data3));
-//
-//        });
+        binding.btnEncode1.setOnClickListener(v -> {
+            //编码
+            for (byte[] data1 : pcmData) {
+                byte[] data2 = new byte[data1.length];
+                int len2 = AudioCodec.g711Encode(data1, data2, data1.length, 1);
+                byte[] data3 = ByteUtil.subByte(data2, 0, len2);
+                encodeData.add(data3);
+            }
+            binding.tvEncode.setText("编码数据:\n" + ByteUtil.bytesToHexWithSpace(encodeData.get(encodeData.size() - 1)));
+        });
+        binding.btnPlay.setOnClickListener(v -> {
+            //解码
+            for (byte[] data1 : encodeData) {
+                byte[] data2 = new byte[data1.length * 2];
+                int len2 = AudioCodec.g711Decode(data1, data2, data1.length, 1);
+                byte[] data3 = ByteUtil.subByte(data2, 0, len2);
+                decodeData.add(data3);
+            }
+            //播放
+        });
 
-        //加解密
-        binding.btnDecode.setOnClickListener(v -> {
+//        //加解密
+//        binding.btnDecode.setOnClickListener(v -> {
 //            byte[] data = new byte[240];//每次收到的数据240B
 //            byte[] encodeData = new byte[240];//编码后的数据240B
 //            byte[] decodeData = new byte[1600];//解码后大小480B
@@ -131,8 +137,8 @@ public class MainActivity extends AppCompatActivity {
 //            int encodeLen = AudioCodec.g723Encode(data, encodeData, data.length);
 //            int decodeLen = AudioCodec.g723Decode(data, decodeData, data.length);
 //            binding.tvResult.setText("原始长度=" + data.length + "\n编码后长度=" + encodeLen + "\n解码后长度=" + decodeLen);
-
-        });
+//
+//        });
     }
 
     private void initData() {
@@ -140,17 +146,27 @@ public class MainActivity extends AppCompatActivity {
         audioRecordHelper.init(new AudioRecordHelper.AudioRecordListener() {
             @Override
             public void onAudioRecord(byte[] data1, int len1) {
-                //byte[] data1 = ByteUtil.subByte(data, 0, length);
+                byte[] data2 = ByteUtil.subByte(data1, 0, len1);
+                pcmData.add(data2);
+                binding.getRoot().post(() -> {
+                    binding.tvPcm.setText("原始数据:\n" + ByteUtil.bytesToHexWithSpace(pcmData.get(pcmData.size() - 1)));
+                    //打印数据
+                   /*StringBuilder pcmHex = new StringBuilder();
+                   for (byte[] item : pcmData) {
+                       pcmHex.append(ByteUtil.bytesToHexWithSpace(item));
+                   }
+                   binding.tvPcm.setText(pcmHex);
+                   binding.tvPcm.scrollTo(0, textView.getLayout().getLineTop(textView.getLineCount()) - textView.getHeight());*/
+                });
                 //编码
-                byte[] data2 = new byte[len1];
+                /*byte[] data2 = new byte[len1];
                 int len2 = AudioCodec.g711Encode(data1, data2, len1, 1);
                 data2 = ByteUtil.subByte(data2, 0, len2);
                 //存入列表
-                audioData.add(data2);
+                audioData.add(data2);*/
             }
         });
     }
-
 
 
 }
