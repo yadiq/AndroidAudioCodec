@@ -15,7 +15,7 @@ public class AudioCodec {
     }
 
     /**
-     * g711编码
+     * g711编码 (编码后长度为1/2)
      *
      * @param in    输入
      * @param out   输出
@@ -26,7 +26,7 @@ public class AudioCodec {
     public static native int g711Encode(byte[] in, byte[] out, int inLen, int type);
 
     /**
-     * g711解码
+     * g711解码 (解码后长度为2倍)
      *
      * @param in    输入
      * @param out   输出
@@ -37,7 +37,7 @@ public class AudioCodec {
     public static native int g711Decode(byte[] in, byte[] out, int inLen, int type);
 
     /**
-     * g723编码
+     * g723编码 (编码后长度为1/5.3)
      *
      * @param in    输入
      * @param out   输出
@@ -47,7 +47,7 @@ public class AudioCodec {
     public static native int g723Encode(byte[] in, byte[] out, int inLen);
 
     /**
-     * g723解码
+     * g723解码 (解码后长度为5.3倍)
      *
      * @param in    输入
      * @param out   输出

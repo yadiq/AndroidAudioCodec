@@ -18,6 +18,7 @@ import com.hqumath.nativedemo.media.AudioPlayHelper;
 import com.hqumath.nativedemo.media.AudioRecordHelper;
 import com.hqumath.nativedemo.utils.ByteUtil;
 import com.hqumath.nativedemo.utils.CommonUtil;
+import com.hqumath.nativedemo.utils.LogUtil;
 
 import org.freedesktop.audiocodec.AudioCodec;
 
@@ -37,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private final String TAG = "Native";
     private final int REQUEST_RECORD_AUDIO = 0x01;//请求录音权限
     private Activity mContext;
+    private int encodeType = 0;//当前编码类型 0:g711u 1:g723
     private List<byte[]> pcmData = new ArrayList<>();//原始数据
     private List<byte[]> encodeData = new ArrayList<>();//编码数据
     private List<byte[]> decodeData = new ArrayList<>();//解码数据
@@ -99,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
                             binding.tvEncode.setText("");
                             pcmData.clear();
                             encodeData.clear();
+                            decodeData.clear();
                             //开始录音
                             if (audioRecordHelper != null)
                                 audioRecordHelper.start();
@@ -122,10 +125,35 @@ public class MainActivity extends AppCompatActivity {
             //清空缓存
             binding.tvEncode.setText("");
             encodeData.clear();
+            decodeData.clear();
+            if (pcmData.isEmpty()) {
+                CommonUtil.toast("请先录音");
+                return;
+            }
             //编码
+            encodeType = 0;
             for (byte[] data1 : pcmData) {
                 byte[] data2 = new byte[data1.length];
                 int len2 = AudioCodec.g711Encode(data1, data2, data1.length, 1);
+                byte[] data3 = ByteUtil.subByte(data2, 0, len2);
+                encodeData.add(data3);
+            }
+            binding.tvEncode.setText("编码数据:\n" + ByteUtil.bytesToHexWithSpace(encodeData.get(encodeData.size() - 1)));
+        });
+        binding.btnEncode2.setOnClickListener(v -> {
+            //清空缓存
+            binding.tvEncode.setText("");
+            encodeData.clear();
+            decodeData.clear();
+            if (pcmData.isEmpty()) {
+                CommonUtil.toast("请先录音");
+                return;
+            }
+            //编码
+            encodeType = 1;
+            for (byte[] data1 : pcmData) {
+                byte[] data2 = new byte[data1.length];
+                int len2 = AudioCodec.g723Encode(data1, data2, data1.length);
                 byte[] data3 = ByteUtil.subByte(data2, 0, len2);
                 encodeData.add(data3);
             }
@@ -137,10 +165,21 @@ public class MainActivity extends AppCompatActivity {
                 audioPlayHelper.stop();
                 return;
             }
+            //清空缓存
+            decodeData.clear();
+            if (encodeData.isEmpty()) {
+                CommonUtil.toast("请先编码数据");
+                return;
+            }
             //解码
             for (byte[] data1 : encodeData) {
-                byte[] data2 = new byte[data1.length * 2];
-                int len2 = AudioCodec.g711Decode(data1, data2, data1.length, 1);
+                byte[] data2 = new byte[data1.length * 6];
+                int len2 = 0;
+                if (encodeType == 0) {
+                    len2 = AudioCodec.g711Decode(data1, data2, data1.length, 1);
+                } else if (encodeType == 1) {
+                    len2 = AudioCodec.g723Decode(data1, data2, data1.length);
+                }
                 byte[] data3 = ByteUtil.subByte(data2, 0, len2);
                 decodeData.add(data3);
             }
