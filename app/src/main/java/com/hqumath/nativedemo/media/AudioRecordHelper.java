@@ -1,4 +1,4 @@
-package com.hqumath.nativedemo;
+package com.hqumath.nativedemo.media;
 
 import android.media.AudioFormat;
 import android.media.AudioRecord;
@@ -7,7 +7,7 @@ import android.media.MediaRecorder;
 import com.hqumath.nativedemo.app.AppExecutors;
 
 /**
- * 手机拾音，录制和发送数据
+ * 手机拾音
  */
 public class AudioRecordHelper {
     public static final String TAG = "AudioRecordHelper";
