@@ -3,7 +3,7 @@
 #include <android/log.h>
 
 #include <stdlib.h>
-#include "g72x.h"
+#include "codec/g72x.h"
 
 //打印日志 LOGI("failed to open file: %s %d", "string", 0);
 #define  LOG_TAG    "JNI_log"

@@ -50,18 +50,11 @@ android {
         }
     }
     //开启动态库编译
-    //ndk_build已弃用
     externalNativeBuild {
-        ndkBuild {
-            path file('src/main/jni_audio_codec/Android.mk')
+        cmake {
+            path file('src/main/jni_audio_codec/CMakeLists.txt')
         }
     }
-    //cmake跨平台
-    /*externalNativeBuild {
-        cmake {
-            path file('src/main/jni_demo/CMakeLists.txt')
-        }
-    }*/
 }
 
 dependencies {

@@ -11,7 +11,7 @@ package org.freedesktop.audiocodec;
 public class AudioCodec {
     ////////////////////////////////////native///////////////////////////////////
     static {
-        System.loadLibrary("AudioCodec");
+        System.loadLibrary("audio_codec");
     }
 
     /**
