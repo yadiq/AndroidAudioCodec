@@ -189,22 +189,6 @@ public class MainActivity extends AppCompatActivity {
                 audioPlayHelper.start();
             }
         });
-
-//        //加解密
-//        binding.btnDecode.setOnClickListener(v -> {
-//            byte[] data = new byte[240];//每次收到的数据240B
-//            byte[] encodeData = new byte[240];//编码后的数据240B
-//            byte[] decodeData = new byte[1600];//解码后大小480B
-//
-//            int encodeLen = AudioCodec.g711Encode(data, encodeData, data.length, 1);
-//            int decodeLen = AudioCodec.g711Decode(data, decodeData, data.length, 1);
-//            binding.tvResult.setText("原始长度=" + data.length + "\n编码后长度=" + encodeLen + "\n解码后长度=" + decodeLen);
-//
-//            int encodeLen = AudioCodec.g723Encode(data, encodeData, data.length);
-//            int decodeLen = AudioCodec.g723Decode(data, decodeData, data.length);
-//            binding.tvResult.setText("原始长度=" + data.length + "\n编码后长度=" + encodeLen + "\n解码后长度=" + decodeLen);
-//
-//        });
     }
 
     private void initData() {
